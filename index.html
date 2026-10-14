@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ur" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Review Agent Dashboard</title>
+<style>
+  body { font-family: Arial; background: #0f172a; color: #e2e8f0; margin: 0; padding: 20px; }
+  .container { max-width: 700px; margin: auto; }
+  h1 { color: #38bdf8; text-align: center; }
+  label { display: block; margin-top: 12px; font-weight: bold; }
+  input, textarea, select {
+    width: 100%; padding: 10px; margin-top: 5px;
+    background: #1e293b; color: #e2e8f0; border: 1px solid #334155; border-radius: 8px;
+    box-sizing: border-box;
+  }
+  button {
+    margin-top: 20px; padding: 12px 20px; background: #38bdf8;
+    color: #0f172a; border: none; border-radius: 8px; font-weight: bold;
+    cursor: pointer; width: 100%;
+  }
+  button:hover { background: #0ea5e9; }
+  #result { margin-top: 20px; padding: 15px; background: #1e293b; border-radius: 8px; white-space: pre-wrap; font-size: 13px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Google Review Removal Agent</h1>
+
+  <label>Business ka naam</label>
+  <input id="business" placeholder="Test Shop">
+
+  <label>Review ka link</label>
+  <input id="link" placeholder="https://maps.google.com/...">
+
+  <label>Reviewer ka naam</label>
+  <input id="reviewer" placeholder="Ali">
+
+  <label>Rating (1-5)</label>
+  <input id="rating" placeholder="1">
+
+  <label>Review ka text</label>
+  <textarea id="review_text" rows="4" placeholder="Buy cheap products..."></textarea>
+
+  <label>Violation type</label>
+  <select id="violation">
+    <option value="Spam / advertisement">Spam / advertisement</option>
+    <option value="Fake engagement / jhoothi review">Fake engagement / jhoothi review</option>
+    <option value="Off-topic / unrelated">Off-topic / unrelated</option>
+    <option value="Threat / harassment / hate">Threat / harassment / hate</option>
+    <option value="Personal information leak">Personal information leak</option>
+    <option value="Koi violation nahi">Koi violation nahi (jaiz negative review)</option>
+  </select>
+
+  <label>Evidence / tafseel</label>
+  <input id="evidence" placeholder="Contains spam link">
+
+  <button onclick="submitReview()">Report Tayaar Karein</button>
+
+  <div id="result"></div>
+</div>
+
+<script>
+async function submitReview() {
+  const data = {
+    business: document.getElementById("business").value,
+    link: document.getElementById("link").value,
+    reviewer: document.getElementById("reviewer").value,
+    rating: document.getElementById("rating").value,
+    review_text: document.getElementById("review_text").value,
+    violation: document.getElementById("violation").value,
+    evidence: document.getElementById("evidence").value
+  };
+
+  document.getElementById("result").textContent = "Processing...";
+
+  try {
+    const res = await fetch("http://127.0.0.1:8000/analyze", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data)
+    });
+    const out = await res.json();
+    document.getElementById("result").textContent = JSON.stringify(out, null, 2);
+  } catch (e) {
+    document.getElementById("result").textContent = "Error: " + e.message;
+  }
+}
+</script>
+</body>
+</html>
